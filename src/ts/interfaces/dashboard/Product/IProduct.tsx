@@ -5,7 +5,7 @@ interface IProduct {
   isAvailable: boolean;
   stock: number;
   ExtraField?: IExtraFields[] | null;
-  image: string;
+  image: File | null;
 }
 
 interface IExtraFields {

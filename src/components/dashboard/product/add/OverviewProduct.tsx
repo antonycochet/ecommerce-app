@@ -17,14 +17,14 @@ import {
 } from '../../../../ts/interfaces/dashboard/Product/IProduct';
 
 export default function ProductOverview() {
-  const [product, setProduct] = useState<IProduct | {}>({
+  const [product, setProduct] = useState<IProduct>({
     title: '',
     price: 0,
     fullDescription: '',
-    isAvailable: false,
+    isAvailable: true,
     stock: 0,
     ExtraField: [],
-    image: '',
+    image: null,
   });
   const [extraFields, setExtraFields] = useState<IExtraFields[]>([]);
   const [isOpenAddExtraField, setIsOpenAddExtraField] =
@@ -37,13 +37,22 @@ export default function ProductOverview() {
     formState: { errors },
   } = useForm();
   const onSubmit = (data: any) => {
+    /*
     setProduct({
       title: data.title,
       price: data.price,
       stock: data.stock,
       fullDescription: data.fullDescription,
     });
+    */
     console.log(product);
+  };
+
+  const handleChangeInputContent = (value: string | number, type: any) => {
+    setProduct((prevState) => ({
+      ...prevState,
+      [type]: value,
+    }));
   };
 
   const addProduct = async (product: any) => {
@@ -55,6 +64,8 @@ export default function ProductOverview() {
       console.log('error creating product:', err);
     }
   };
+
+  console.log(product);
 
   return (
     <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl px-4 md:px-6 py-6">
@@ -72,7 +83,7 @@ export default function ProductOverview() {
       </div>
       <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-row w-full justify-between">
-          <OverviewGallery />
+          <OverviewGallery setProduct={setProduct} product={product} />
           <div className="flex flex-col w-6/12">
             <div className="flex flex-col space-y-8">
               <div className="relative w-6/12">
@@ -81,7 +92,11 @@ export default function ProductOverview() {
                   id="title"
                   className="block p-4 w-full font-semibold text-gray-900 bg-gray-100 rounded-md appearance-none focus:outline-none peer"
                   placeholder=" "
-                  {...register('title')}
+                  {...(register('title'),
+                  {
+                    onChange: (e) =>
+                      handleChangeInputContent(e.target.value, 'title'),
+                  })}
                 />
                 <label
                   htmlFor="title"
@@ -99,7 +114,14 @@ export default function ProductOverview() {
                     defaultValue={0}
                     className="relative block p-4 w-full font-semibold text-gray-900 bg-gray-100 rounded-md appearance-none focus:outline-none peer text-xl"
                     placeholder=" "
-                    {...register('price')}
+                    {...(register('price'),
+                    {
+                      onChange: (e) =>
+                        handleChangeInputContent(
+                          Number(e.target.value),
+                          'price'
+                        ),
+                    })}
                   />
                   <div className="px-2 bg-white absolute right-8 top-1/2 transform -translate-y-1/2 font-semibold rounded-md">
                     €
@@ -119,7 +141,14 @@ export default function ProductOverview() {
                     defaultValue={0}
                     className="block p-4 w-full font-semibold text-gray-900 bg-gray-100 rounded-md appearance-none focus:outline-none peer text-xl"
                     placeholder=" "
-                    {...register('stock')}
+                    {...(register('stock'),
+                    {
+                      onChange: (e) =>
+                        handleChangeInputContent(
+                          Number(e.target.value),
+                          'stock'
+                        ),
+                    })}
                   />
                   <label
                     htmlFor="title"
@@ -135,7 +164,14 @@ export default function ProductOverview() {
                   id="description"
                   className="block w-full p-4 font-semibold text-gray-900 bg-gray-100 rounded-md appearance-none focus:outline-none peer"
                   placeholder=" "
-                  {...register('fullDescription')}
+                  {...(register('fullDescription'),
+                  {
+                    onChange: (e) =>
+                      handleChangeInputContent(
+                        e.target.value,
+                        'fullDescription'
+                      ),
+                  })}
                 ></textarea>
                 <label
                   htmlFor="description"
@@ -145,7 +181,7 @@ export default function ProductOverview() {
                 </label>
               </div>
               <div className="overflow-hidden flex flex-col border-2 border-gray-200 border-dashed rounded-md w-full px-4 pb-4 relative space-y-4">
-                {0 === 0 ? (
+                {product.ExtraField?.length ? (
                   <>
                     {/* List of extra fields */}
                     {<DragAndDrop extraFields={extraFields} />}
