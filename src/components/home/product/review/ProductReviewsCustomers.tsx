@@ -14,29 +14,17 @@ export default function ProductReviewsCustomers() {
         content:
           'Does drinking coffee make you smarter? Ask Me Anything: 10 answers to your questions about coffee',
       },
-      {
-        id: 2,
-        content: "So you've bought coffee... now what?",
-      },
     ],
     FAQ: [
       {
         id: 1,
         content: 'Is tech making coffee better or worse?',
       },
-      {
-        id: 2,
-        content: 'The most innovative things happening in coffee',
-      },
     ],
     Tendance: [
       {
         id: 1,
         content: 'Ask Me Anything: 10 answers to your questions about coffee',
-      },
-      {
-        id: 2,
-        content: "The worst advice we've ever heard about coffee",
       },
     ],
   });

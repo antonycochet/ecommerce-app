@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-amplify/ui-react": "^4.3.4",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
     "@lottiefiles/react-lottie-player": "^3.4.9",

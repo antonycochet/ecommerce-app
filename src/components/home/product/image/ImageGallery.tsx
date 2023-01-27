@@ -1,5 +1,5 @@
 interface IImageGallery {
-  product: { images: { src: string; alt: string }[] };
+  product: any;
 }
 
 export default function ImageGallery({ product }: IImageGallery) {
@@ -7,12 +7,12 @@ export default function ImageGallery({ product }: IImageGallery) {
     <div className="flex flex-col mt-8">
       <div>
         <img
-          src={product.images[1].src}
-          alt={product.images[1].alt}
+          src={product.image}
           style={{ height: '500px' }}
           className="w-full object-cover rounded-md"
         />
       </div>
+      {/*
       <div className="flex flex-row justify-between space-x-12 mt-8">
         <div>
           <img
@@ -36,6 +36,7 @@ export default function ImageGallery({ product }: IImageGallery) {
           />
         </div>
       </div>
+        */}
     </div>
   );
 }

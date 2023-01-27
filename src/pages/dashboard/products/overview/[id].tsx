@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { RadioGroup } from '@headlessui/react';
+import { Storage } from 'aws-amplify';
 import { CheckIcon } from '@heroicons/react/24/solid';
 
 import ImageGallery from '../../../../components/home/product/image/ImageGallery';
@@ -8,81 +7,48 @@ import ProductFullDetails from '../../../../components/home/product/details/Prod
 import ProductColorChoices from '../../../../components/home/product/details/color/ProductColorChoices';
 import ProductSizeChoices from '../../../../components/home/product/details/size/ProductSizeChoices';
 import Link from 'next/link';
+import { getProduct } from '../../../../graphql/queries';
+import { API, withSSRContext } from 'aws-amplify';
+import { NextPageContext } from 'next';
+import { IProduct } from '../../../../ts/interfaces/dashboard/Product/IProduct';
+import ProductReviewsCustomers from '../../../../components/home/product/review/ProductReviewsCustomers';
 
-const product: any = {
-  name: "Acqua D'Alfresco",
-  price: '29 €',
-  images: [
-    {
-      src: 'https://images.pexels.com/photos/5205809/pexels-photo-5205809.jpeg?auto=compress&cs=tinysrgb&w=1600',
-      alt: 'Two each of gray, white, and black shirts laying flat.',
-    },
-    {
-      src: 'https://images.pexels.com/photos/5205867/pexels-photo-5205867.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-      alt: 'Model wearing plain black basic tee.',
-    },
-    {
-      src: 'https://images.pexels.com/photos/5205824/pexels-photo-5205824.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-      alt: 'Model wearing plain gray basic tee.',
-    },
-    {
-      src: 'https://images.pexels.com/photos/5205817/pexels-photo-5205817.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load',
-      alt: 'Model wearing plain white basic tee.',
-    },
-  ],
-  colors: [
-    { name: 'White', class: 'bg-white', selectedClass: 'ring-gray-400' },
-    { name: 'Gray', class: 'bg-gray-200', selectedClass: 'ring-gray-400' },
-    { name: 'Black', class: 'bg-gray-900', selectedClass: 'ring-gray-900' },
-  ],
-  sizes: [
-    { name: 'XXS', inStock: false },
-    { name: 'XS', inStock: true },
-    { name: 'S', inStock: true },
-    { name: 'M', inStock: true },
-    { name: 'L', inStock: true },
-    { name: 'XL', inStock: true },
-  ],
-  description:
-    'The Basic Tee 6-Pack allows you to fully express your vibrant personality with three grayscale options. Feeling adventurous? Put on a heather gray tee. Want to be a trendsetter? Try our exclusive colorway: "Black". Need to add an extra pop of color to your outfit? Our white tee has you covered.',
-  highlights: [
-    'Hand cut and sewn locally',
-    'Dyed with our proprietary colors',
-    'Pre-washed & pre-shrunk',
-    'Ultra-soft 100% cotton',
-  ],
-  details:
-    'The 6-Pack includes two black, two white, and two heather gray Basic Tees. Sign up for our subscription service and be the first to get new, exciting colors, like our upcoming "Charcoal Gray" limited release.',
-};
-const reviews = { href: '#', average: 4, totalCount: 117 };
+const reviews = { href: '#', average: 5, totalCount: 100 };
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function ProductOverview() {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
+interface IProductOverview {
+  data: IProduct;
+}
+
+export default function ProductOverview({ data }: IProductOverview) {
+  //const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+  //const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
+
+  console.log(data);
 
   return (
     <div className="bg-white">
       <div className="pt-6 max-w-7xl mx-auto px-8">
         <Link
-          href={'/dashboard/products/add-product/'}
+          href={'/dashboard/products/'}
           className="rounded-md bg-indigo-600 text-white px-4 py-2 font-medium text-sm"
         >
-          Retour à la création du produit
+          Retour à la liste des produits
         </Link>
         <div className="flex flex-row justify-between">
           {/* Image gallery */}
           <div className="flex flex-col w-5/12">
-            <ImageGallery product={product} />
+            <ImageGallery product={data} />
+            <ProductReviewsCustomers />
           </div>
           {/* Product info */}
           <div className="w-6/12 pt-8 pb-16 sm:px-6 lg:border-r lg:border-gray-200">
             <div className="lg:col-span-2">
               <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-                {product.name}
+                {data.title}
               </h1>
             </div>
 
@@ -90,7 +56,7 @@ export default function ProductOverview() {
             <div className="mt-4 lg:row-span-3 lg:mt-0">
               <h2 className="sr-only">Information produit</h2>
               <p className="text-2xl tracking-tight text-gray-900">
-                {product.price}
+                {data.price} €
               </p>
 
               {/* Reviews */}
@@ -98,27 +64,33 @@ export default function ProductOverview() {
 
               {/* Description and details */}
               <div className="mt-10">
-                <p className="text-base text-gray-600 font-normal">
-                  {product.description}
+                <p className="text-base text-gray-600 font-medium">
+                  {data.fullDescription}
                 </p>
               </div>
 
               <form className="mt-10">
-                {/* Colors */}
-                <ProductColorChoices
-                  product={product}
-                  setSelectedColor={setSelectedColor}
-                  selectedColor={selectedColor}
-                  classNames={classNames}
-                />
+                {/* Colors
+                  {product.ExtraField && product.ExtraField.colors && (
+                    <ProductColorChoices
+                      product={product}
+                      setSelectedColor={setSelectedColor}
+                      selectedColor={selectedColor}
+                      classNames={classNames}
+                    />
+                  )}
+                */}
 
-                {/* Sizes */}
-                <ProductSizeChoices
-                  product={product}
-                  setSelectedSize={setSelectedSize}
-                  selectedSize={selectedSize}
-                  classNames={classNames}
-                />
+                {/* Sizes
+                  {product.ExtraField && product.ExtraField.sizes && (
+                    <ProductSizeChoices
+                      product={product}
+                      setSelectedSize={setSelectedSize}
+                      selectedSize={selectedSize}
+                      classNames={classNames}
+                    />
+                  )}
+                */}
 
                 <div className="flex space-x-6 items-center w-full mt-8">
                   <button
@@ -138,12 +110,33 @@ export default function ProductOverview() {
             </div>
 
             <div className="mt-8">
-              {/* Full Details Accordion */}
-              <ProductFullDetails product={product} />
+              {/* Full Details Accordion
+                <ProductFullDetails product={data} />
+                 */}
             </div>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+export async function getServerSideProps(context: NextPageContext) {
+  // Fetch data from external API
+  const SSR = withSSRContext();
+
+  const idProduct = context.query.id;
+
+  const apiData = await SSR.API.graphql({
+    query: getProduct,
+    variables: { id: idProduct },
+  });
+
+  //sign image from aws s3
+  const imageSigned = await Storage.get(apiData.data.getProduct.image);
+
+  const data = apiData.data.getProduct;
+  data.image = imageSigned;
+
+  return { props: { data } };
 }

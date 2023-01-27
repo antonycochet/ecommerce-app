@@ -1,51 +1,63 @@
-import { API, graphqlOperation } from 'aws-amplify';
+import { API, graphqlOperation, Storage } from 'aws-amplify';
 import { createProduct } from '../../../../graphql/mutations';
-import { TProduct } from '../../../../ts/types/product/tproduct';
 import { useForm } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import {
+  ArrowUturnLeftIcon,
   InformationCircleIcon,
   PlusCircleIcon,
 } from '@heroicons/react/20/solid';
-import DragAndDrop from './overview/extra_fields/DragAndDrop';
-import OverviewWizard from './overview/wizard/OverviewWizard';
-import OverviewGallery from './overview/gallery/OverviewGallery';
-import AddExtraFieldsModal from './overview/extra_fields/modal/AddExtraFieldsModal';
 import {
   IExtraFields,
   IProduct,
 } from '../../../../ts/interfaces/dashboard/Product/IProduct';
+import { useRouter } from 'next/router';
+import DragAndDrop from '../common/extra_fields/DragAndDrop';
+import AddExtraFieldsModal from '../common/extra_fields/modal/AddExtraFieldsModal';
+import OverviewGallery from '../common/gallery/OverviewGallery';
+import OverviewWizard from '../common/wizard/OverviewWizard';
+import Link from 'next/link';
 
-export default function ProductOverview() {
-  const [product, setProduct] = useState<IProduct>({
-    title: '',
-    price: 0,
-    fullDescription: '',
-    isAvailable: true,
-    stock: 0,
-    ExtraField: [],
-    image: null,
-  });
+const initialValue = {
+  title: '',
+  price: 0,
+  stock: 0,
+  reference: '',
+  fullDescription: '',
+  isAvailable: true,
+  //ExtraField: [],
+  image: null,
+};
+
+export default function AddProduct() {
+  const [product, setProduct] = useState<IProduct>(initialValue);
   const [extraFields, setExtraFields] = useState<IExtraFields[]>([]);
   const [isOpenAddExtraField, setIsOpenAddExtraField] =
     useState<boolean>(false);
+  const router = useRouter();
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
-  } = useForm();
-  const onSubmit = (data: any) => {
-    /*
-    setProduct({
-      title: data.title,
-      price: data.price,
-      stock: data.stock,
-      fullDescription: data.fullDescription,
-    });
-    */
-    console.log(product);
+  } = useForm({ defaultValues: initialValue });
+  const onSubmit = () => {
+    if (product.image !== null && typeof product.image !== 'string') {
+      Storage.put('products/' + product.image.name, product.image, {
+        resumable: true,
+        completeCallback: (event) => {
+          setProduct((prevState) => ({
+            ...prevState,
+            image: String(event.key),
+          }));
+        },
+        errorCallback: (err) => {
+          console.error('Unexpected error while uploading', err);
+        },
+      });
+    }
   };
 
   const handleChangeInputContent = (value: string | number, type: any) => {
@@ -59,22 +71,32 @@ export default function ProductOverview() {
     try {
       if (!product.title) return;
       await API.graphql(graphqlOperation(createProduct, { input: product }));
-      reset();
+      router.push('/dashboard/products');
     } catch (err) {
       console.log('error creating product:', err);
     }
   };
 
-  console.log(product);
+  useEffect(() => {
+    if (typeof product.image === 'string') {
+      addProduct(product);
+    }
+  }, [product.image]);
 
   return (
     <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl px-4 md:px-6 py-6">
       <div className="flex flex-row items-center pb-8 w-full justify-between">
         <div className="flex flex-row items-center space-x-2 w-5/12">
+          <Link
+            className="bg-indigo-600 rounded-md p-2 mr-4 flex items-center text-white"
+            href={'/dashboard/products'}
+          >
+            <ArrowUturnLeftIcon className="w-4 h-4" />
+          </Link>
           <h3 className="text-2xl tracking-tighter font-bold text-slate-800">
             Ajout d'un produit
           </h3>
-          <InformationCircleIcon className="w-5 h-5 text-slate-500" />
+          <InformationCircleIcon className="w-5 h-5 text-slate-400 cursor-pointer" />
         </div>
         <OverviewWizard
           handleSubmit={handleSubmit(onSubmit)}
@@ -83,10 +105,10 @@ export default function ProductOverview() {
       </div>
       <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-row w-full justify-between">
-          <OverviewGallery setProduct={setProduct} product={product} />
+          <OverviewGallery setProduct={setProduct} />
           <div className="flex flex-col w-6/12">
-            <div className="flex flex-col space-y-8">
-              <div className="relative w-6/12">
+            <div className="flex flex-col space-y-4">
+              <div className="relative w-full">
                 <input
                   type="text"
                   id="title"
@@ -106,12 +128,11 @@ export default function ProductOverview() {
                 </label>
               </div>
               <div className="flex flex-row space-x-6">
-                <div className="relative w-5/12">
+                <div className="relative w-4/12">
                   <input
                     type="number"
-                    id="title"
+                    id="price"
                     min={0}
-                    defaultValue={0}
                     className="relative block p-4 w-full font-semibold text-gray-900 bg-gray-100 rounded-md appearance-none focus:outline-none peer text-xl"
                     placeholder=" "
                     {...(register('price'),
@@ -127,18 +148,17 @@ export default function ProductOverview() {
                     €
                   </div>
                   <label
-                    htmlFor="title"
+                    htmlFor="price"
                     className="absolute rounded-md text-sm text-gray-600 duration-300 transform -translate-y-4 bg-white top-2 z-10 origin-[0] px-2 peer-focus:px-2 peer-focus:text-gray-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-90 peer-focus:bg-white font-semibold peer-focus:-translate-y-4 left-2"
                   >
                     Prix
                   </label>
                 </div>
-                <div className="relative w-3/12">
+                <div className="relative w-4/12">
                   <input
                     type="number"
-                    id="title"
+                    id="stock"
                     min={0}
-                    defaultValue={0}
                     className="block p-4 w-full font-semibold text-gray-900 bg-gray-100 rounded-md appearance-none focus:outline-none peer text-xl"
                     placeholder=" "
                     {...(register('stock'),
@@ -151,10 +171,29 @@ export default function ProductOverview() {
                     })}
                   />
                   <label
-                    htmlFor="title"
+                    htmlFor="stock"
                     className="absolute rounded-md text-sm text-gray-600 duration-300 transform -translate-y-4 bg-white top-2 z-10 origin-[0] px-2 peer-focus:px-2 peer-focus:text-gray-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-90 peer-focus:bg-white font-semibold peer-focus:-translate-y-4 left-2"
                   >
                     Stock
+                  </label>
+                </div>
+                <div className="relative w-4/12">
+                  <input
+                    type="text"
+                    id="reference"
+                    className="block p-4 w-full font-semibold text-gray-900 bg-gray-100 rounded-md appearance-none focus:outline-none peer"
+                    placeholder=" "
+                    {...(register('reference'),
+                    {
+                      onChange: (e) =>
+                        handleChangeInputContent(e.target.value, 'reference'),
+                    })}
+                  />
+                  <label
+                    htmlFor="reference"
+                    className="absolute rounded-md text-sm text-gray-600 duration-300 transform -translate-y-4 bg-white top-2 z-10 origin-[0] px-2 peer-focus:px-2 peer-focus:text-gray-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-90 peer-focus:bg-white font-semibold peer-focus:-translate-y-4 left-2"
+                  >
+                    Référence produit
                   </label>
                 </div>
               </div>

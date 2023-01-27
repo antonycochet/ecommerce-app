@@ -15,11 +15,12 @@
       "auth": {
         "ecommerceapp6075d520": {}
       },
+      "storage": {
+        "s378f65188": {},
+        "s3ecommerceappstoragedd379e4c": {}
+      },
       "api": {
         "ecommerceapp": {}
-      },
-      "storage": {
-        "s378f65188": {}
       }
     }
   }

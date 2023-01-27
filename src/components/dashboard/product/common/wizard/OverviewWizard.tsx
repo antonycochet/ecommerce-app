@@ -8,7 +8,7 @@ import {
 import Link from 'next/link';
 import { title } from 'process';
 import { useEffect, useState } from 'react';
-import { IProduct } from '../../../../../../ts/interfaces/dashboard/Product/IProduct';
+import { IProduct } from '../../../../../ts/interfaces/dashboard/Product/IProduct';
 
 interface IOverviewWizard {
   handleSubmit: () => void;
@@ -35,7 +35,7 @@ export default function OverviewWizard({
   const [stepSettings, setStepSettings] = useState(listStepsWizard);
 
   const handleWizardStep = (
-    image: File | null,
+    image: string | File | null,
     content: {
       title: string;
       price: number;
@@ -70,6 +70,41 @@ export default function OverviewWizard({
     handleWizardStep(image, content);
   }, [product]);
 
+  const handleValidation = (
+    stepSettings: {
+      type: string;
+      content: string;
+      isCompleted: boolean;
+    }[]
+  ) => {
+    let renderButtonValisation;
+    if (stepSettings[0].isCompleted && stepSettings[1].isCompleted) {
+      renderButtonValisation = (
+        <button
+          onClick={handleSubmit}
+          type="submit"
+          className={`${
+            stepSettings[0].isCompleted && stepSettings[1].isCompleted
+              ? 'bg-indigo-600 cursor-pointer'
+              : 'bg-slate-200 cursor-not-allowed'
+          } rounded-md text-white px-4 py-2 font-medium text-sm`}
+        >
+          Valider
+        </button>
+      );
+    } else {
+      renderButtonValisation = (
+        <button
+          type="submit"
+          className="bg-slate-200 cursor-not-allowed rounded-md text-white px-4 py-2 font-medium text-sm"
+        >
+          Valider
+        </button>
+      );
+    }
+    return renderButtonValisation;
+  };
+
   return (
     <div className="w-6/12 flex flex-row items-center space-x-2 justify-between">
       <ol className="flex items-center w-full text-sm font-medium text-center sm:text-base">
@@ -80,12 +115,13 @@ export default function OverviewWizard({
           ) => {
             return (
               <li
+                key={index}
                 className={`flex md:w-full items-center text-white sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-1 xl:after:mx-2`}
               >
                 <div
                   className={`${
                     elem.isCompleted
-                      ? 'bg-green-300 shadow-green-300/50'
+                      ? 'bg-blue-300 shadow-blue-300/50'
                       : 'bg-gray-200 shadow-gray-300/50'
                   } py-1 px-4 rounded-md`}
                 >
@@ -103,13 +139,7 @@ export default function OverviewWizard({
           }
         )}
         <li className="flex items-center">
-          <button
-            onClick={handleSubmit}
-            type="submit"
-            className="rounded-md bg-slate-200 text-white px-4 py-2 font-medium text-sm"
-          >
-            Valider
-          </button>
+          {handleValidation(stepSettings)}
           {/* <Link
             href={'/dashboard/products/overview/4'}
             className="rounded-md bg-slate-800 text-white px-4 py-2 font-medium text-sm"

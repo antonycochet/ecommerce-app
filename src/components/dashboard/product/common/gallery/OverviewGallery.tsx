@@ -6,19 +6,15 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { IProduct } from '../../../../../../ts/interfaces/dashboard/Product/IProduct';
+import { IProduct } from '../../../../../ts/interfaces/dashboard/Product/IProduct';
 
 const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
 interface IOverviewGallery {
   setProduct: Dispatch<SetStateAction<IProduct>>;
-  product: IProduct | {};
 }
 
-export default function OverviewGallery({
-  setProduct,
-  product,
-}: IOverviewGallery) {
+export default function OverviewGallery({ setProduct }: IOverviewGallery) {
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
   const [fileDataURL, setFileDataURL] = useState<string | null>(null);
@@ -114,7 +110,8 @@ export default function OverviewGallery({
             <img
               src={fileDataURL}
               alt="preview"
-              className="h-96 object-cover w-full rounded-lg"
+              style={{ maxHeight: '500px' }}
+              className="object-cover w-full rounded-lg"
             />
             <button
               className="bg-indigo-600 rounded-md px-4 py-2 text-white absolute bottom-6 text-sm transform -translate-x-1/2 left-1/2"

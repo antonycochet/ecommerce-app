@@ -2,11 +2,11 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/20/solid';
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import DashboardHomeReactSelect from '../../../../../../common/form/Select/ReactSelect';
+import { IExtraFields } from '../../../../../../ts/interfaces/dashboard/Product/IProduct';
+import DashboardHomeReactSelect from '../../../../../common/form/Select/ReactSelect';
 import CapacityExtraFields from './input_type/CapacityExtraFields';
 import ColorExtraFields from './input_type/ColorExtraFields';
 import HightlightExtraFields from './input_type/HightlightExtraFields';
-import { IExtraFields } from '../../../../../../../ts/interfaces/dashboard/Product/IProduct';
 
 interface IAddExtraFieldsModal {
   setIsOpenAddExtraField: Dispatch<SetStateAction<boolean>>;

@@ -7,9 +7,7 @@
           "additionalAuthenticationProviders": [],
           "defaultAuthentication": {
             "apiKeyConfig": {
-              "apiKeyExpirationDate": "2023-12-02T14:16:22.287Z",
-              "apiKeyExpirationDays": 365,
-              "description": ""
+              "apiKeyExpirationDays": 7
             },
             "authenticationType": "API_KEY"
           }
@@ -46,10 +44,10 @@
     }
   },
   "storage": {
-    "s378f65188": {
-      "service": "S3",
+    "s3ecommerceappstoragedd379e4c": {
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
-      "dependsOn": []
+      "service": "S3"
     }
   }
 }

@@ -1,12 +1,15 @@
-import { API } from 'aws-amplify';
+import { API, Storage } from 'aws-amplify';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { listProducts } from '../../../graphql/queries';
-import { TProduct } from '../../../ts/types/product/tproduct';
+import { IProduct } from '../../../ts/interfaces/dashboard/Product/IProduct';
 import Dropdown from '../../common/dropdowns/Index';
+import { useRouter } from 'next/router';
+import { deleteProduct } from '../../../graphql/mutations';
 
 export default function ListProducts() {
-  const [products, setProducts] = useState<TProduct[]>([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
+  let router = useRouter();
 
   useEffect(() => {
     fetchProducts();
@@ -16,6 +19,25 @@ export default function ListProducts() {
     const apiData: any = await API.graphql({ query: listProducts });
     setProducts(apiData.data.listProducts.items);
   }
+
+  const objectOverview = ({ id }: IProduct) => {
+    router.push(`/dashboard/products/overview/${id}`);
+  };
+
+  const objectEdit = ({ id }: IProduct) => {
+    router.push(`/dashboard/products/edit/${id}`);
+  };
+
+  const objectRemove = async ({ id, image }: IProduct) => {
+    const newProductArray = products.filter((product) => product.id !== id);
+    try {
+      await API.graphql({ query: deleteProduct, variables: { input: { id } } });
+      setProducts(newProductArray);
+      await Storage.remove(`${image}`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <>
@@ -27,7 +49,7 @@ export default function ListProducts() {
             </h3>
             <Link
               className="flex-shrink-0 bg-[conic-gradient(at_bottom_right,_var(--tw-gradient-stops))] from-green-300 via-blue-500 to-purple-600 text-sm text-white py-3 px-2 rounded shadow-md shadow-indigo-500/50"
-              href="/dashboard/products/add-product"
+              href="/dashboard/products/add/product"
             >
               Ajouter un produit
             </Link>
@@ -39,16 +61,16 @@ export default function ListProducts() {
                   Nom du produit
                 </th>
                 <th scope="col" className="py-3 px-6">
-                  <div className="flex items-center">Marque</div>
-                </th>
-                <th scope="col" className="py-3 px-6">
-                  <div className="flex items-center">Categorie</div>
-                </th>
-                <th scope="col" className="py-3 px-6">
                   <div className="flex items-center">Prix</div>
                 </th>
                 <th scope="col" className="py-3 px-6">
                   <div className="flex items-center">Stock</div>
+                </th>
+                <th scope="col" className="py-3 px-6">
+                  <div className="flex items-center">Référence</div>
+                </th>
+                <th scope="col" className="py-3 px-6">
+                  <div className="flex items-center">Description</div>
                 </th>
                 <th scope="col" className="py-3 px-6">
                   <div className="flex items-center">Disponibilité</div>
@@ -71,10 +93,14 @@ export default function ListProducts() {
                     >
                       {product.title}
                     </th>
-                    <td className="py-4 px-6">{product.brand.title}</td>
-                    <td className="py-4 px-6">{product.category.title}</td>
                     <td className="py-4 px-6">{product.price} €</td>
                     <td className="py-4 px-6">{product.stock}</td>
+                    <td className="py-4 px-6">{product.reference}</td>
+                    <td className="py-4 px-6">
+                      {product.fullDescription.length < 160
+                        ? product.fullDescription
+                        : product.fullDescription.slice(0, 157) + ' ...'}
+                    </td>
                     <td className="py-4 px-6">
                       {product.isAvailable ? (
                         <div className="flex items-center">
@@ -89,7 +115,12 @@ export default function ListProducts() {
                       )}
                     </td>
                     <td className="py-4 px-6 text-right">
-                      <Dropdown />
+                      <Dropdown
+                        objectOverview={objectOverview}
+                        objectEdit={objectEdit}
+                        objectRemove={objectRemove}
+                        product={product}
+                      />
                     </td>
                   </tr>
                 );

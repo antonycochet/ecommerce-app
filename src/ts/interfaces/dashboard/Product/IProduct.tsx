@@ -1,11 +1,13 @@
 interface IProduct {
+  id?: string;
   title: string;
   price: number;
+  stock: number;
+  reference: string;
   fullDescription: string;
   isAvailable: boolean;
-  stock: number;
   ExtraField?: IExtraFields[] | null;
-  image: File | null;
+  image: File | string | null;
 }
 
 interface IExtraFields {
