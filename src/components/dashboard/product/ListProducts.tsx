@@ -85,7 +85,7 @@ export default function ListProducts() {
                 return (
                   <tr
                     key={product.id}
-                    className="bg-white border-b last:border-none"
+                    className="bg-white border-b last:border-none text-xs"
                   >
                     <th
                       scope="row"
@@ -93,33 +93,32 @@ export default function ListProducts() {
                     >
                       {product.title}
                     </th>
-                    <td className="py-4 px-6">{product.price} €</td>
-                    <td className="py-4 px-6">{product.stock}</td>
-                    <td className="py-4 px-6">{product.reference}</td>
-                    <td className="py-4 px-6">
+                    <td className="py-4 px-4">{product.price} €</td>
+                    <td className="py-4 px-4">{product.stock}</td>
+                    <td className="py-4 px-4">{product.reference}</td>
+                    <td className="py-4 px-4">
                       {product.fullDescription.length < 160
                         ? product.fullDescription
                         : product.fullDescription.slice(0, 157) + ' ...'}
                     </td>
-                    <td className="py-4 px-6">
-                      {product.isAvailable ? (
-                        <div className="flex items-center">
-                          <div className="bg-green-500 w-3 h-3 rounded-full mr-2"></div>
-                          <span>Disponible</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center">
-                          <div className="bg-red-600 w-3 h-3 rounded-full mr-2"></div>
-                          <span>Non Disponible</span>
-                        </div>
-                      )}
+                    <td className="py-4 px-4">
+                      <div className="flex items-center">
+                        <div
+                          className={`${
+                            product.isAvailable ? 'bg-green-500' : 'bg-red-500'
+                          } w-3 h-3 rounded-full mr-2`}
+                        ></div>
+                        <span>
+                          {product.isAvailable ? 'Disponible' : 'Indisponible'}
+                        </span>
+                      </div>
                     </td>
                     <td className="py-4 px-6 text-right">
                       <Dropdown
                         objectOverview={objectOverview}
                         objectEdit={objectEdit}
                         objectRemove={objectRemove}
-                        product={product}
+                        object={product}
                       />
                     </td>
                   </tr>
