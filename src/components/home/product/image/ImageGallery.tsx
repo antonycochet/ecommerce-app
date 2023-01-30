@@ -1,3 +1,5 @@
+import { s3PublicStorage } from '../../../../ts/utils/getS3Storage';
+
 interface IImageGallery {
   product: any;
 }
@@ -6,11 +8,18 @@ export default function ImageGallery({ product }: IImageGallery) {
   return (
     <div className="flex flex-col mt-8">
       <div>
-        <img
-          src={product.image}
-          style={{ height: '500px' }}
-          className="w-full object-cover rounded-md"
-        />
+        {product ? (
+          <img
+            src={s3PublicStorage + product.image}
+            style={{ height: '500px' }}
+            className="w-full object-cover rounded-md"
+          />
+        ) : (
+          <div
+            style={{ height: '500px' }}
+            className="w-full object-cover rounded-md bg-gray-100 animate-pulse"
+          ></div>
+        )}
       </div>
       {/*
       <div className="flex flex-row justify-between space-x-12 mt-8">

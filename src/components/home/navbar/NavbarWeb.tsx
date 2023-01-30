@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { s3PublicStorage } from '../../../ts/utils/getS3Storage';
 import { Dispatch, Fragment, SetStateAction, useState } from 'react';
 import { Popover, Transition } from '@headlessui/react';
 import {
@@ -7,32 +8,22 @@ import {
   ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
 import ShoppingCart from '../shopping-cart/Index';
+import { IProduct } from '../../../ts/interfaces/dashboard/Product/IProduct';
 
 interface menuInterface {
-  navigation: {
-    categories: {
-      id: string;
-      name: string;
-      products: {
-        name: string;
-        href: string;
-        imageSrc: string;
-        imageAlt: string;
-      }[];
-    }[];
-  };
   classNames: (...classes: string[]) => string;
   setOpen: Dispatch<SetStateAction<boolean>>;
   user: { username: string };
   signOut(): void;
+  products: IProduct[];
 }
 
 export default function NavbarWeb({
-  navigation,
   classNames,
   setOpen,
   user,
   signOut,
+  products,
 }: menuInterface) {
   let [isOpen, setIsOpen] = useState(false);
 
@@ -68,77 +59,72 @@ export default function NavbarWeb({
             {/* Flyout menus */}
             <Popover.Group className="hidden lg:ml-8 lg:block lg:self-stretch">
               <div className="flex h-full space-x-8">
-                {navigation.categories.map((category) => (
-                  <Popover key={category.name} className="flex">
-                    {({ open }) => (
-                      <>
-                        <div className="relative flex">
-                          <Popover.Button
-                            className={classNames(
-                              open
-                                ? 'border-indigo-600 text-indigo-600'
-                                : 'border-transparent text-gray-700 hover:text-gray-800',
-                              'relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out outline-none'
-                            )}
-                          >
-                            {category.name}
-                          </Popover.Button>
-                        </div>
-
-                        <Transition
-                          as={Fragment}
-                          enter="transition ease-out duration-200"
-                          enterFrom="opacity-0"
-                          enterTo="opacity-100"
-                          leave="transition ease-in duration-150"
-                          leaveFrom="opacity-100"
-                          leaveTo="opacity-0"
+                <Popover key="boutique" className="flex">
+                  {({ open }) => (
+                    <>
+                      <div className="relative flex">
+                        <Popover.Button
+                          className={classNames(
+                            open
+                              ? 'border-indigo-600 text-indigo-600'
+                              : 'border-transparent text-gray-700 hover:text-gray-800',
+                            'relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out outline-none'
+                          )}
                         >
-                          <Popover.Panel className="absolute inset-x-0 top-full text-sm text-gray-500">
-                            {/* Presentational element used to render the bottom shadow, if we put the shadow on the actual panel it pokes out the top, so we use this shorter element to hide the top of the shadow */}
-                            <div
-                              className="absolute inset-0 top-1/2 bg-white shadow"
-                              aria-hidden="true"
-                            />
+                          La boutique
+                        </Popover.Button>
+                      </div>
 
-                            <div className="relative bg-white">
-                              <div className="mx-auto max-w-7xl px-8">
-                                <div className="grid grid-cols-2 gap-y-10 gap-x-8 py-16">
-                                  <div className="col-start-1 grid grid-cols-3 gap-x-8">
-                                    {category.products.map((item) => (
-                                      <div
-                                        key={item.name}
-                                        className="group relative text-base sm:text-sm"
-                                      >
-                                        <div className="aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                      <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-200"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="transition ease-in duration-150"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                      >
+                        <Popover.Panel className="absolute inset-x-0 top-full text-sm text-gray-500">
+                          {/* Presentational element used to render the bottom shadow, if we put the shadow on the actual panel it pokes out the top, so we use this shorter element to hide the top of the shadow */}
+                          <div
+                            className="absolute inset-0 top-1/2 bg-white shadow"
+                            aria-hidden="true"
+                          />
+
+                          <div className="relative bg-white">
+                            <div className="mx-auto max-w-7xl px-8">
+                              <div className="grid grid-cols-2 gap-y-10 gap-x-8 py-16">
+                                <div className="col-start-1 grid grid-cols-3 gap-x-8">
+                                  {products.map((product) => (
+                                    <div
+                                      key={product.id}
+                                      className="group relative text-base sm:text-sm"
+                                    >
+                                      <div className="aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                        <Link href={`/products/${product.id}`}>
                                           <img
-                                            src={item.imageSrc}
-                                            alt={item.imageAlt}
+                                            src={
+                                              s3PublicStorage + product.image
+                                            }
+                                            alt={product.title}
                                             className="object-cover object-center"
                                           />
-                                        </div>
-                                        <a
-                                          href={item.href}
-                                          className="mt-4 block font-medium text-gray-900"
-                                        >
-                                          <span
-                                            className="absolute inset-0 z-10"
-                                            aria-hidden="true"
-                                          />
-                                          {item.name}
-                                        </a>
+                                        </Link>
                                       </div>
-                                    ))}
-                                  </div>
+                                      <a className="mt-4 block font-medium text-gray-900">
+                                        {product.title}
+                                      </a>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
                             </div>
-                          </Popover.Panel>
-                        </Transition>
-                      </>
-                    )}
-                  </Popover>
-                ))}
+                          </div>
+                        </Popover.Panel>
+                      </Transition>
+                    </>
+                  )}
+                </Popover>
               </div>
             </Popover.Group>
 

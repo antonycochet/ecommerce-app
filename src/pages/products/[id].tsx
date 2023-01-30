@@ -10,7 +10,7 @@ export default function product() {
 
   return (
     <>
-      <Navbar user={user} />
+      <Navbar user={user} products={products} />
       <ProductOverview />
     </>
   );

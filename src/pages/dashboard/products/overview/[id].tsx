@@ -132,11 +132,7 @@ export async function getServerSideProps(context: NextPageContext) {
     variables: { id: idProduct },
   });
 
-  //sign image from aws s3
-  const imageSigned = await Storage.get(apiData.data.getProduct.image);
-
   const data = apiData.data.getProduct;
-  data.image = imageSigned;
 
   return { props: { data } };
 }

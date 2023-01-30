@@ -4,18 +4,6 @@ import { Dialog, Tab, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface menuInterface {
-  navigation: {
-    categories: {
-      id: string;
-      name: string;
-      products: {
-        name: string;
-        href: string;
-        imageSrc: string;
-        imageAlt: string;
-      }[];
-    }[];
-  };
   classNames: (...classes: string[]) => string;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -24,7 +12,6 @@ interface menuInterface {
 }
 
 export default function NavbarMobile({
-  navigation,
   classNames,
   open,
   setOpen,
@@ -73,7 +60,7 @@ export default function NavbarMobile({
                 <Tab.Group as="div" className="mt-2">
                   <div className="border-b border-gray-200">
                     <Tab.List className="-mb-px flex space-x-8 px-4">
-                      {navigation.categories.map((category) => (
+                      {/*navigation.categories.map((category) => (
                         <Tab
                           key={category.name}
                           className={({ selected }) =>
@@ -87,11 +74,11 @@ export default function NavbarMobile({
                         >
                           {category.name}
                         </Tab>
-                      ))}
+                        ))*/}
                     </Tab.List>
                   </div>
                   <Tab.Panels as={Fragment}>
-                    {navigation.categories.map((category) => (
+                    {/*navigation.categories.map((category) => (
                       <Tab.Panel
                         key={category.name}
                         className="space-y-10 px-4 pt-10 pb-8"
@@ -123,7 +110,7 @@ export default function NavbarMobile({
                           ))}
                         </div>
                       </Tab.Panel>
-                    ))}
+                          ))*/}
                   </Tab.Panels>
                 </Tab.Group>
 
