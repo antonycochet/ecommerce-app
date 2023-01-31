@@ -1,6 +1,6 @@
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/20/solid';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { IExtraFields } from '../../../../../../../../ts/interfaces/dashboard/Product/IProduct';
+import { IExtraFields } from '../../../../../../../ts/interfaces/dashboard/Product/IProduct';
 
 interface IHightlightExtraFields {
   handleApplyExtraFields: () => void;
