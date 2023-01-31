@@ -38,14 +38,6 @@ export default function NavbarDashboard() {
       href: '/dashboard/products',
     },
     {
-      name: 'Marques',
-      href: '/dashboard/brands',
-    },
-    {
-      name: 'Catégories',
-      href: '/dashboard/categories',
-    },
-    {
       name: 'Utilisateurs',
       href: '/dashboard/users',
     },
