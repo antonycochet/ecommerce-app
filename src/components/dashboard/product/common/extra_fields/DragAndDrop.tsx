@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Reorder } from 'framer-motion';
-import { IData } from '../../../../../../ts/interfaces/dashboard/Product/IProduct';
+import { IExtraFields } from '../../../../../ts/interfaces/dashboard/Product/IProduct';
 import { Item } from './Item';
 
 interface IDragAndDrop {
-  extraFields: IData[] | any;
+  extraFields: IExtraFields[] | any;
 }
 
 export default function DragAndDrop({ extraFields }: IDragAndDrop) {
-  const [items, setItems] = useState<IData[]>([]);
+  const [items, setItems] = useState<IExtraFields[]>([]);
 
   useEffect(() => {
     setItems(extraFields);
