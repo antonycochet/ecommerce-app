@@ -1,4 +1,6 @@
 interface IProduct {
+  createdAt?: any;
+  updatedAt?: any;
   id?: string;
   title: string;
   price: number;

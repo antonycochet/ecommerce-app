@@ -1,7 +1,7 @@
-import { TProduct } from '../../../ts/types/product/tproduct';
+import { IProduct } from '../../../ts/interfaces/dashboard/Product/IProduct';
 
 interface IProductListByCategory {
-  products: TProduct[];
+  products: IProduct[];
 }
 
 export default function ProductListByCategory({

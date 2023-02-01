@@ -1,14 +1,13 @@
 import Link from 'next/link';
 import { s3PublicStorage } from '../../../ts/utils/getS3Storage';
-import { Dispatch, Fragment, SetStateAction, useState } from 'react';
+import { Dispatch, Fragment, SetStateAction, useState, useEffect } from 'react';
 import { Popover, Transition } from '@headlessui/react';
-import {
-  Bars3Icon,
-  MagnifyingGlassIcon,
-  ShoppingBagIcon,
-} from '@heroicons/react/24/outline';
+import { Bars3Icon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import ShoppingCart from '../shopping-cart/Index';
 import { IProduct } from '../../../ts/interfaces/dashboard/Product/IProduct';
+import { ICart } from '../../../ts/interfaces/home/Cart/ICart';
+import { CartContext } from '../../../context/CartContext';
+import { useContext } from 'react';
 
 interface menuInterface {
   classNames: (...classes: string[]) => string;
@@ -26,10 +25,12 @@ export default function NavbarWeb({
   products,
 }: menuInterface) {
   let [isOpen, setIsOpen] = useState(false);
+  let { shoppingCart } = useContext(CartContext);
 
   function openModal() {
     setIsOpen(true);
   }
+
   return (
     <header className="relative bg-white z-10">
       <nav aria-label="Top" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -46,14 +47,14 @@ export default function NavbarWeb({
 
             {/* Logo */}
             <div className="ml-4 flex lg:ml-0">
-              <a href="/">
+              <Link href="/">
                 <span className="sr-only">Your Company</span>
                 <img
                   className="h-8 w-auto"
                   src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
                   alt=""
                 />
-              </a>
+              </Link>
             </div>
 
             {/* Flyout menus */}
@@ -100,17 +101,17 @@ export default function NavbarWeb({
                                       key={product.id}
                                       className="group relative text-base sm:text-sm"
                                     >
-                                      <div className="aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-                                        <Link href={`/products/${product.id}`}>
+                                      <Link href={`/products/${product.id}`}>
+                                        <div className="overflow-hidden w-full rounded-md">
                                           <img
                                             src={
                                               s3PublicStorage + product.image
                                             }
                                             alt={product.title}
-                                            className="object-cover object-center"
+                                            className="object-center hover:scale-110 transition duration-300 object-cover"
                                           />
-                                        </Link>
-                                      </div>
+                                        </div>
+                                      </Link>
                                       <a className="mt-4 block font-medium text-gray-900">
                                         {product.title}
                                       </a>
@@ -183,7 +184,7 @@ export default function NavbarWeb({
                     aria-hidden="true"
                   />
                   <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                    0
+                    {shoppingCart.products.length}
                   </span>
                   <span className="sr-only">items in cart, view bag</span>
                 </button>

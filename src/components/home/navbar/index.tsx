@@ -1,22 +1,24 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Auth } from 'aws-amplify';
 import { useRouter } from 'next/router';
+import { IProduct } from '../../../ts/interfaces/dashboard/Product/IProduct';
+import UserContext from '../../../context/UserContext';
 import NavbarMobile from './NavbarMobile';
 import NavbarWeb from './NavbarWeb';
-import { IProduct } from '../../../ts/interfaces/dashboard/Product/IProduct';
 
 const classNames = (...classes: string[]): string => {
   return classes.filter(Boolean).join(' ');
 };
 
 interface NavbarInterface {
-  user: { username: string };
   products: IProduct[];
 }
 
-export default function Navbar({ user, products }: NavbarInterface) {
+export default function Navbar({ products }: NavbarInterface) {
   const [open, setOpen] = useState<boolean>(false);
   const router = useRouter();
+  const user = useContext(UserContext);
+
   async function signOut() {
     try {
       await Auth.signOut().then(() => {

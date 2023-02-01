@@ -46,10 +46,12 @@ export default function SectionCategory({ products }: ISectionCategory) {
                   className="w-4/12 px-8 -ml-8"
                 >
                   <Link href={`products/${product.id}`}>
-                    <img
-                      className="rounded-md hover:scale-105 transition duration-150 object-cover w-full"
-                      src={s3PublicStorage + product.image}
-                    />
+                    <div className="overflow-hidden w-full rounded-md">
+                      <img
+                        className="hover:scale-110 transition duration-300 object-cover"
+                        src={s3PublicStorage + product.image}
+                      />
+                    </div>
                   </Link>
                   <div className="leading-5 mt-8">
                     <h4 className="text-gray-500 font-normal">

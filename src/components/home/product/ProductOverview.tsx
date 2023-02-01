@@ -1,14 +1,16 @@
 import { CheckIcon } from '@heroicons/react/24/solid';
+import { API } from 'aws-amplify';
+import { useRouter } from 'next/router';
+import { useEffect, useState, useContext } from 'react';
+import { getProduct } from '../../../graphql/queries';
+import { IProduct } from '../../../ts/interfaces/dashboard/Product/IProduct';
+import { updateProduct } from '../../../graphql/mutations';
 
 import Breadcrumb from './breadcrumb/Index';
 import ImageGallery from './image/ImageGallery';
-import { API, Storage } from 'aws-amplify';
-
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { getProduct } from '../../../graphql/queries';
-import { IProduct } from '../../../ts/interfaces/dashboard/Product/IProduct';
 import ProductReviewsCustomers from './review/ProductReviewsCustomers';
+import { CartContext } from '../../../context/CartContext';
+import { handleAddLocalStorageValue } from '../../../ts/helperFunctions/localStorage/handleLocalStorage';
 
 const reviews = { href: '#', average: 4, totalCount: 117 };
 
@@ -20,6 +22,7 @@ export default function ProductOverview() {
   const [product, setProduct] = useState<IProduct>();
   const router = useRouter();
   const productId = String(router.query.id);
+  const { shoppingCart, setShoppingCart } = useContext(CartContext);
 
   useEffect(() => {
     fetchProduct(productId);
@@ -32,6 +35,19 @@ export default function ProductOverview() {
     });
     setProduct(apiData.data.getProduct);
   };
+
+  const handleAddToCart = async (product: IProduct) => {
+    if (product.isAvailable) {
+      try {
+        setShoppingCart({ products: [...shoppingCart.products, product] });
+        handleAddLocalStorageValue('shoppingCartStorage', product, 'array');
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
+  console.log(product);
 
   return (
     <div className="bg-white">
@@ -89,32 +105,30 @@ export default function ProductOverview() {
                 )}
               </div>
 
-              <form className="mt-10">
-                <div className="flex space-x-6 items-center w-full mt-8">
+              <div className="flex space-x-6 items-center w-full mt-10">
+                {product ? (
+                  <button
+                    onClick={() => handleAddToCart(product)}
+                    className="flex w-8/12 items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  >
+                    Ajouter au panier
+                  </button>
+                ) : (
+                  <div className="w-8/12 bg-gray-100 rounded-md animate-pulse h-14"></div>
+                )}
+                <div className="flex items-center space-x-1 justify-between">
                   {product ? (
-                    <button
-                      type="submit"
-                      className="flex w-8/12 items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                      Ajouter au panier
-                    </button>
+                    <>
+                      <CheckIcon className="w-5 h-5 text-green-500" />
+                      <span className="text-sm text-gray-500">
+                        Produit disponible
+                      </span>
+                    </>
                   ) : (
-                    <div className="w-8/12 bg-gray-100 rounded-md animate-pulse h-14"></div>
+                    <></>
                   )}
-                  <div className="flex items-center space-x-1 justify-between">
-                    {product ? (
-                      <>
-                        <CheckIcon className="w-5 h-5 text-green-500" />
-                        <span className="text-sm text-gray-500">
-                          Produit disponible
-                        </span>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                  </div>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>
